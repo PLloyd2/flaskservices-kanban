@@ -10,6 +10,7 @@ def parse_matrix(data, key):
     except (KeyError, ValueError) as e:         
         raise ValueError(f"Matrice '{key}' invalide : {e}") 
 
+
 # --- Route 1 — Addition de matrices ---
 @app.route('/matrices/add', methods=['POST']) 
 def add_matrices(): 
@@ -27,7 +28,6 @@ def add_matrices():
         return jsonify({'erreur': str(e)}), 400 
     
 @app.route('/matrices/multiply', methods=['POST']) 
-
 def multiply_matrices(): 
     data = request.get_json()     
     try:         
@@ -39,6 +39,17 @@ def multiply_matrices():
         return jsonify({'operation': 'multiplication', 'resultat': result})     
     except (ValueError, TypeError) as e: 
         return jsonify({'erreur': str(e)}), 400 
+    
+@app.route('/matrices/transpose', methods=['POST']) 
+def transpose_matrix():
+    data = request.get_json()     
+    try:         
+        A = parse_matrix(data, 'A')         
+        result = A.T.tolist()         
+        return jsonify({'operation': 'transposee', 'resultat': result})     
+    except (ValueError, TypeError) as e:
+        return jsonify({'erreur': str(e)}), 400
+
 
 
 
