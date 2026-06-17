@@ -16,17 +16,18 @@ def add_matrices():
     data = request.get_json()     
     try:         
         A = parse_matrix(data, 'A')         
-        B = parse_matrix(data, 'B')         
+        B = parse_matrix(data, 'B')       
         
         if A.shape != B.shape: 
             return jsonify({'erreur': 'Dimensions incompatibles'}), 400         
         
         result = (A + B).tolist()         
-        return jsonify({'operation': 'addition', 'resultat': result})     
+        return jsonify({'operation': 'addition', 'resultat': result})   
     except (ValueError, TypeError) as e: 
         return jsonify({'erreur': str(e)}), 400 
     
 @app.route('/matrices/multiply', methods=['POST']) 
+
 def multiply_matrices(): 
     data = request.get_json()     
     try:         
