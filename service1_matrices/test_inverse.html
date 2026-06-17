@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Inverse</title>
+</head>
+<body>
+
+    <h3>Test de l'Inverse (Service 1)</h3>
+    
+    <label>Matrice au format JSON :</label><br>
+    <textarea id="matrixInput" rows="5" cols="30">{"A": [[4, 7], [2, 6]]}</textarea>
+    <br><br>
+    
+    <button onclick="runInverseTest()">Calculer l'Inverse</button>
+
+    <h4>Resultat de l'API :</h4>
+    <pre id="output">En attente du clic...</pre>
+
+<script>
+    async function runInverseTest() {
+        const outputField = document.getElementById("output");
+        const jsonText = document.getElementById("matrixInput").value;
+        
+        outputField.innerText = "Envoi en cours...";
+
+        try {
+            // Envoi de la requete fetch vers la route /matrices/inverse
+            const response = await fetch("http://localhost:5001/matrices/inverse", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: jsonText
+            });
+
+            const data = await response.json();
+
+            // Si le serveur renvoie un code de succes (200)
+            if (response.ok) {
+                outputField.innerText = JSON.stringify(data, null, 2);
+            } else {
+                // Si le serveur renvoie une erreur (ex: matrice singuliere ou non carree)
+                outputField.innerText = "Erreur " + response.status + " : " + data.erreur;
+            }
+        } catch (err) {
+            // En cas de probleme de connexion ou de CORS non active
+            outputField.innerText = "Erreur : Impossible de joindre le service sur le port 5001. Verifie Flask et CORS.";
+        }
+    }
+</script>
+</body>
+</html>
