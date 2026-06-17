@@ -25,5 +25,5 @@ def fetch_series(nom_serie):
     cursor.close()
     conn.close()
     if not rows:
-        raise ValueError(f"Aucune donnée trouvée pour la série '{nom_serie}'")
+        raise ValueError(f"Aucune donnee trouvee pour la serie '{nom_serie}'")
     return [float(row[0]) for row in rows]
