@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Determinant</title>
+</head>
+<body>
+
+    <h3>Test du Determinant (Service 1)</h3>
+    
+    <label>Matrice carree au format JSON :</label><br>
+    <textarea id="matrixInput" rows="5" cols="30">{"A": [[1, 2], [3, 4]]}</textarea>
+    <br><br>
+    
+    <button onclick="runDeterminantTest()">Calculer le Determinant</button>
+
+    <h4>Resultat de l'API :</h4>
+    <pre id="output">En attente du clic...</pre>
+
+<script>
+    async function runDeterminantTest() {
+        const outputField = document.getElementById("output");
+        const jsonText = document.getElementById("matrixInput").value;
+        
+        outputField.innerText = "Envoi en cours...";
+
+        try {
+            // Envoi de la requete fetch vers la route /matrices/determinant
+            const response = await fetch("http://localhost:5001/matrices/determinant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: jsonText
+            });
+
+            const data = await response.json();
+
+            // Si le serveur renvoie un code de succes
+            if (response.ok) {
+                outputField.innerText = JSON.stringify(data, null, 2);
+            } else {
+                // Si le serveur renvoie une erreur (ex: matrice non carree)
+                outputField.innerText = "Erreur " + response.status + " : " + data.erreur;
+            }
+        } catch (err) {
+            // En cas de coupure réseau ou serveur Flask éteint
+            outputField.innerText = "Erreur : Impossible de joindre le service sur le port 5001. Verifie Flask et CORS.";
+        }
+    }
+</script>
+</body>
+</html>
