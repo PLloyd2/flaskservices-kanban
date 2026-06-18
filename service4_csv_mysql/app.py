@@ -90,5 +90,27 @@ def upload_csv():
         'message': f'{insertions} ligne(s) chargée(s) dans la table donnees'
     }), 201
 
+@app.route('/upload/series', methods=['GET'])
+def list_series():
+    """Retourne la liste des séries chargées et leur nombre de points."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT nom_serie, COUNT(*) AS n, MIN(date_mesure), MAX(date_mesure)'
+            ' FROM donnees GROUP BY nom_serie ORDER BY nom_serie'
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        series = [
+            {'serie': r[0], 'n_points': r[1],
+             'debut': str(r[2]), 'fin': str(r[3])}
+            for r in rows
+        ]
+        return jsonify({'series': series, 'total': len(series)})
+    except Exception as e:
+        return jsonify({'erreur': 'Erreur base de données', 'detail': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5004)
