@@ -1,3 +1,2 @@
 service3_stats_mysql/.env
 service3_stats_mysql/venv/
-service3_stats_mysql/__pycache__/
