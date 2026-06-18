@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Transpose</title>
+</head>
+<body>
+
+    <h3>Test de la Transposition (Service 1)</h3>
+    
+    <label>Matrice au format JSON :</label><br>
+    <textarea id="matrixInput" rows="5" cols="30">{"A": [[1, 2, 3], [4, 5, 6]]}</textarea>
+    <br><br>
+    
+    <button onclick="runTransposeTest()">Calculer la Transposee</button>
+
+    <h4>Resultat de l'API :</h4>
+    <pre id="output">En attente du clic...</pre>
+
+<script>
+    // Fonction asynchrone pour envoyer la requete sans bloquer le navigateur
+    async function runTransposeTest() {
+        // On recupere la zone d'affichage et le texte ecrit par l'utilisateur
+        const outputField = document.getElementById("output");
+        const jsonText = document.getElementById("matrixInput").value;
+        
+        // On affiche un message temporaire pendant le chargement
+        outputField.innerText = "Envoi en cours...";
+
+        try {
+            // On envoie la matrice a Flask avec fetch()
+            const response = await fetch("http://localhost:5001/matrices/transpose", {
+                method: "POST", // Methode POST requise pour envoyer des donnees
+                headers: { "Content-Type": "application/json" }, // On signale qu'on envoie du JSON
+                body: jsonText // Le contenu de la matrice
+            });
+
+            // On transforme la reponse recue en objet JavaScript
+            const data = await response.json();
+
+            // Si la reponse est OK (code 200 à 299)
+            if (response.ok) {
+                // On transforme le JSON en texte lisible pour l'afficher
+                outputField.innerText = JSON.stringify(data, null, 2);
+            } else {
+                // Si le serveur renvoie une erreur (ex: code 400), on affiche le message d'erreur
+                outputField.innerText = "Erreur " + response.status + " : " + data.erreur;
+            }
+        } catch (err) {
+            // Si le serveur est eteint ou que le CORS bloque la requete, on arrive ici
+            outputField.innerText = "Erreur : Impossible de joindre le service sur le port 5001. Verifie que Flask tourne et que CORS est active.";
+        }
+    }
+</script>
+</body>
+</html>
