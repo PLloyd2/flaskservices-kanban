@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tests Service 3</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { margin: 5px; padding: 8px 15px; cursor: pointer; background-color: #2d6a4f; color: white; border: none; border-radius: 4px; }
+    button:hover { background-color: #1b4332; }
+    pre { background: #f0f0f0; padding: 10px; border-radius: 4px; }
+    h2 { color: #2d6a4f; }
+    h3 { color: #1b4332; }
+  </style>
+</head>
+<body>
+  <h2>Tests unitaires — Service 3</h2>
+
+  <!-- ─── Tests route /db/stats/describe ─── -->
+  <h3>Route GET /db/stats/describe</h3>
+
+  <!-- Test avec serie_A -->
+  <button onclick="testDescribe('serie_A')">Test serie_A</button>
+  <!-- Test avec serie_B -->
+  <button onclick="testDescribe('serie_B')">Test serie_B</button>
+  <!-- Test avec une série inexistante -->
+  <button onclick="testDescribe('serie_inexistante')">Test série inexistante (404)</button>
+  <!-- Test sans paramètre -->
+  <button onclick="testDescribeSansParam()">Test sans paramètre (400)</button>
+
+  <!-- Zone d'affichage des résultats describe -->
+  <pre id="result-describe"></pre>
+
+  <!-- ─── Tests route /db/stats/correlation ─── -->
+  <h3>Route GET /db/stats/correlation</h3>
+
+  <!-- Test corrélation serie_A et serie_B -->
+  <button onclick="testCorrelation('serie_A', 'serie_B')">Test serie_A / serie_B</button>
+  <!-- Test corrélation serie_A et serie_C -->
+  <button onclick="testCorrelation('serie_A', 'serie_C')">Test serie_A / serie_C</button>
+  <!-- Test avec une série inexistante -->
+  <button onclick="testCorrelation('serie_inexistante', 'serie_A')">Test série inexistante (404)</button>
+  <!-- Test sans paramètres -->
+  <button onclick="testCorrelationSansParam()">Test sans paramètre (400)</button>
+
+  <!-- Zone d'affichage des résultats correlation -->
+  <pre id="result-correlation"></pre>
+
+  <script>
+    const BASE_URL = "http://localhost:5003";
+
+    // Fonction pour tester la route /db/stats/describe avec un nom de série
+    async function testDescribe(serie) {
+      const response = await fetch(`${BASE_URL}/db/stats/describe?serie=${serie}`);
+      const data = await response.json();
+      // Affichage du statut HTTP et du résultat JSON
+      document.getElementById('result-describe').textContent =
+        `Status: ${response.status}\n` + JSON.stringify(data, null, 2);
+    }
+
+    // Fonction pour tester la route /db/stats/describe sans paramètre
+    async function testDescribeSansParam() {
+      const response = await fetch(`${BASE_URL}/db/stats/describe`);
+      const data = await response.json();
+      document.getElementById('result-describe').textContent =
+        `Status: ${response.status}\n` + JSON.stringify(data, null, 2);
+    }
+
+    // Fonction pour tester la route /db/stats/correlation avec deux séries
+    async function testCorrelation(serie_x, serie_y) {
+      const response = await fetch(
+        `${BASE_URL}/db/stats/correlation?serie_x=${serie_x}&serie_y=${serie_y}`
+      );
+      const data = await response.json();
+      // Affichage du statut HTTP et du résultat JSON
+      document.getElementById('result-correlation').textContent =
+        `Status: ${response.status}\n` + JSON.stringify(data, null, 2);
+    }
+
+    // Fonction pour tester la route /db/stats/correlation sans paramètres
+    async function testCorrelationSansParam() {
+      const response = await fetch(`${BASE_URL}/db/stats/correlation`);
+      const data = await response.json();
+      document.getElementById('result-correlation').textContent =
+        `Status: ${response.status}\n` + JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
