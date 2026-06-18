@@ -65,7 +65,7 @@ def determinant_matrix():
 
 @app.route('/matrices/inverse', methods=['POST']) 
 def inverse_matrix():
-    data = request.get_json()     
+    data = request.get_json() 
     try:         
         A = parse_matrix(data, 'A')         
         if A.shape[0] != A.shape[1]:
