@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Client - Addition</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 15px; font-size: 16px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>Test Unitaire Client - Route Addition</h2>
+    <p>Envoie la matrice A [[1,2],[3,4]] et la matrice B [[5,6],[7,8]] au serveur Flask [Port 5001].</p>
+    
+    <button id="btn-test">Additionner les Matrices</button>
+
+    <h3>Données reçues du service :</h3>
+    <pre id="output">En attente du clic...</pre>
+
+    <script>
+        document.getElementById('btn-test').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.textContent = "Calcul en cours sur le serveur...";
+
+            const payload = {
+                "A": [[1, 2], [3, 4]],
+                "B": [[5, 6], [7, 8]]
+            };
+
+            try {
+                const response = await fetch('http://localhost:5001/matrices/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = "Erreur : " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
