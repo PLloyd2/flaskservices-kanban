@@ -97,6 +97,31 @@ def test_normalite():
     except (ValueError, TypeError) as e:
         return jsonify({'erreur': str(e)}), 400
 
+# Route bonus : test t de Student pour comparer deux groupes
+@app.route('/stats/test_student', methods=['POST'])
+def test_student():
+    # Récupération des données JSON envoyées dans la requête
+    data = request.get_json()
+    try:
+        # Validation et conversion des deux groupes en tableaux numpy
+        groupe1 = validate_data(data, 'groupe1')
+        groupe2 = validate_data(data, 'groupe2')
+        # Calcul du test t de Student : compare les moyennes des deux groupes
+        t_stat, p_value = stats.ttest_ind(groupe1, groupe2)
+        return jsonify({
+            'operation': 'test_t_student',
+            'resultat': {
+                # Statistique t arrondie à 4 décimales
+                't_statistique': round(float(t_stat), 4),
+                # P-value arrondie à 6 décimales
+                'p_value': round(float(p_value), 6),
+                # Si p_value < 0.05, la différence entre les groupes est significative
+                'difference_significative': bool(p_value < 0.05)
+            }
+        })
+    except (ValueError, TypeError) as e:
+        return jsonify({'erreur': str(e)}), 400
+
 # Lancement du serveur Flask sur le port 5002   
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
