@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tests Service 3 — Stats MySQL</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        .test { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .pending { background-color: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; margin-bottom: 20px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Tests unitaires — Service 3</h1>
+    <button onclick="lancerTousLesTests()">▶ Lancer tous les tests</button>
+    <div id="resultats"></div>
+
+    <script>
+        const BASE = "http://localhost:5003";
+
+        function afficherResultat(nom, succes, detail) {
+            const div = document.createElement("div");
+            div.className = `test ${succes ? "pass" : "fail"}`;
+            div.innerHTML = `
+                <strong>${succes ? "✅" : "❌"} ${nom}</strong>
+                <pre>${JSON.stringify(detail, null, 2)}</pre>
+            `;
+            document.getElementById("resultats").appendChild(div);
+        }
+
+        async function testDescribeOk() {
+            const r = await fetch(`${BASE}/db/stats/describe?serie=serie_A`);
+            const data = await r.json();
+            const ok = r.status === 200 && data.resultat && data.resultat.n > 0;
+            afficherResultat("GET /db/stats/describe?serie=serie_A → 200 OK", ok, data);
+        }
+
+        async function testDescribeInexistant() {
+            const r = await fetch(`${BASE}/db/stats/describe?serie=inexistant`);
+            const data = await r.json();
+            const ok = r.status === 404;
+            afficherResultat("GET /db/stats/describe?serie=inexistant → 404", ok, data);
+        }
+
+        async function testDescribeSansParametre() {
+            const r = await fetch(`${BASE}/db/stats/describe`);
+            const data = await r.json();
+            const ok = r.status === 400;
+            afficherResultat("GET /db/stats/describe (sans paramètre) → 400", ok, data);
+        }
+
+        async function testCorrelationOk() {
+            const r = await fetch(`${BASE}/db/stats/correlation?serie_x=serie_A&serie_y=serie_B`);
+            const data = await r.json();
+            const ok = r.status === 200 && data.resultat && "r" in data.resultat;
+            afficherResultat("GET /db/stats/correlation?serie_x=serie_A&serie_y=serie_B → 200 OK", ok, data);
+        }
+
+        async function testCorrelationSansParametre() {
+            const r = await fetch(`${BASE}/db/stats/correlation`);
+            const data = await r.json();
+            const ok = r.status === 400;
+            afficherResultat("GET /db/stats/correlation (sans paramètres) → 400", ok, data);
+        }
+
+        async function testCorrelationInexistant() {
+            const r = await fetch(`${BASE}/db/stats/correlation?serie_x=inexistant&serie_y=serie_B`);
+            const data = await r.json();
+            const ok = r.status === 404;
+            afficherResultat("GET /db/stats/correlation?serie_x=inexistant → 404", ok, data);
+        }
+
+        async function lancerTousLesTests() {
+            document.getElementById("resultats").innerHTML = "";
+            await testDescribeOk();
+            await testDescribeInexistant();
+            await testDescribeSansParametre();
+            await testCorrelationOk();
+            await testCorrelationSansParametre();
+            await testCorrelationInexistant();
+        }
+    </script>
+</body>
+</html>
