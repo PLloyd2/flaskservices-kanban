@@ -65,6 +65,38 @@ def correlation():
     except (ValueError, TypeError) as e:
         return jsonify({'erreur': str(e)}), 400
 
+# Route 3 : test de normalité de Shapiro-Wilk
+@app.route('/stats/test_normalite', methods=['POST'])
+def test_normalite():
+    # Récupération des données JSON envoyées dans la requête
+    data = request.get_json()
+    try:
+        # Validation et conversion des données en tableau numpy
+        values = validate_data(data)
+        # Shapiro-Wilk est limité à 5000 valeurs maximum
+        if len(values) > 5000:
+            return jsonify({'erreur': 'Shapiro-Wilk limite a 5000 valeurs'}), 400
+        # Calcul du test de Shapiro-Wilk : retourne la statistique et la p-value
+        stat, p_value = stats.shapiro(values)
+        return jsonify({
+            'operation': 'test_normalite_shapiro_wilk',
+            'resultat': {
+                # Statistique du test arrondie à 6 décimales
+                'statistique': round(float(stat), 6),
+                # P-value arrondie à 6 décimales
+                'p_value': round(float(p_value), 6),
+                # Si p_value > 0.05, la distribution est considérée normale
+                'est_normale': bool(p_value > 0.05),
+                # Interprétation textuelle du résultat
+                'interpretation': (
+                    'Distribution normale (p > 0.05)' if p_value > 0.05
+                    else 'Distribution non normale (p <= 0.05)'
+                )
+            }
+        })
+    except (ValueError, TypeError) as e:
+        return jsonify({'erreur': str(e)}), 400
+
 # Lancement du serveur Flask sur le port 5002   
 if __name__ == '__main__':
     app.run(debug=True, port=5002)
