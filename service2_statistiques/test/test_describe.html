@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test /stats/describe</title>
+</head>
+<body>
+  <h2>Test unitaire — POST /stats/describe</h2>
+  <!-- Bouton qui déclenche le test au clic -->
+  <button onclick="runTest()">Lancer le test</button>
+  <!-- Zone d'affichage du résultat JSON -->
+  <pre id="result"></pre>
+  <script>
+    async function runTest() {
+      // Envoi d'une requête POST vers la route /stats/describe
+      const response = await fetch('http://localhost:5002/stats/describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // Données de test : tableau de 8 valeurs numériques
+        body: JSON.stringify({ data: [12.5, 15.3, 8.7, 21.0, 13.2, 9.8, 17.6, 11.4] })
+      });
+      // Récupération et affichage de la réponse JSON
+      const data = await response.json();
+      document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
